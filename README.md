@@ -4,6 +4,8 @@
 
 ## 収録スキル
 
+- **`/za:init`** — za の各スキルが参照する `docs/CONTEXT.md`・`docs/PLAN.md`・`docs/ISSUE.md`・
+  `docs/PR.md` をプロジェクトに作成する。CONTEXT.md はリポジトリ調査で中身を埋める。
 - **`/za:plan`** — 開発要件を確認し、プロジェクトのコンテキスト（`docs/CONTEXT.md`）と
   既存コードを踏まえた実装プランを `docs/plans/{yyyymmdd}-{title}.md` に作成する。
   不明点はまずコード調査で解消し、残ったものだけをユーザーに質問する。
