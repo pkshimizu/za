@@ -9,6 +9,7 @@
   },
   "skills": [
     "./skills/plan",
-    "./skills/issue"
+    "./skills/issue",
+    "./skills/fix-issue"
   ]
 }
