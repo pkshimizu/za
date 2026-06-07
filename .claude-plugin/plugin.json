@@ -8,6 +8,7 @@
     "email": "shimizu.kenji@noncore.net"
   },
   "skills": [
-    "./skills/plan"
+    "./skills/plan",
+    "./skills/issue"
   ]
 }
