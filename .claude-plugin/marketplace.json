@@ -17,7 +17,8 @@
       "skills": [
         "./skills/plan",
         "./skills/issue",
-        "./skills/fix-issue"
+        "./skills/fix-issue",
+        "./skills/pr"
       ]
     }
   ]
