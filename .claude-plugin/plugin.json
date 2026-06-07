@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "za",
+  "version": "0.1.0",
+  "description": "開発の要件確認と実装プラン作成の支援",
+  "author": {
+    "name": "shimizu.kenji",
+    "email": "shimizu.kenji@noncore.net"
+  },
+  "skills": [
+    "./skills/plan"
+  ]
+}

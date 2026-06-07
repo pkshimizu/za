@@ -1,0 +1,22 @@
+{
+  "name": "za",
+  "owner": {
+    "name": "shimizu.kenji",
+    "email": "shimizu.kenji@noncore.net"
+  },
+  "metadata": {
+    "description": "za — 開発支援スキル集（実装プラン作成など）",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "za",
+      "description": "開発の要件確認と実装プラン作成の支援",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/plan"
+      ]
+    }
+  ]
+}
