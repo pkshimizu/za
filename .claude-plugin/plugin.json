@@ -11,6 +11,7 @@
     "./skills/plan",
     "./skills/issue",
     "./skills/fix-issue",
-    "./skills/pr"
+    "./skills/pr",
+    "./skills/review"
   ]
 }
