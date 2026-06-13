@@ -11,6 +11,7 @@
     "./skills/init",
     "./skills/plan",
     "./skills/issue",
+    "./skills/resolve-issue",
     "./skills/fix-issue",
     "./skills/pr",
     "./skills/review"
