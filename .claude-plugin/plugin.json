@@ -14,6 +14,7 @@
     "./skills/resolve-issue",
     "./skills/fix-issue",
     "./skills/pr",
-    "./skills/review"
+    "./skills/review",
+    "./skills/merge"
   ]
 }
