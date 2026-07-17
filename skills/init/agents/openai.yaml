@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:init"
+  short_description: "プロジェクトを za 用に初期化する"
+  default_prompt: "このプロジェクトを za のワークフローで使えるように初期化してください。"
+
+policy:
+  allow_implicit_invocation: true

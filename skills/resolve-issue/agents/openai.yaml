@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:resolve-issue"
+  short_description: "GitHub issue の不明点と対応方針を整理する"
+  default_prompt: "GitHub issue の不明点を調査し、対応方針を確定してください。"
+
+policy:
+  allow_implicit_invocation: true

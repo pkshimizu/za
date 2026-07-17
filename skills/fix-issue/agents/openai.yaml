@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:fix-issue"
+  short_description: "GitHub issue を実装してコミットする"
+  default_prompt: "GitHub issue の内容に従って実装し、コミットしてください。"
+
+policy:
+  allow_implicit_invocation: true

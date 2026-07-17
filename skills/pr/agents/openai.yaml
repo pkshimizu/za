@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:pr"
+  short_description: "現在の変更から GitHub PR を作成する"
+  default_prompt: "現在のブランチの変更を確認し、GitHub PR を作成してください。"
+
+policy:
+  allow_implicit_invocation: true

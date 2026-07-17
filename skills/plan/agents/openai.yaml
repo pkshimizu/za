@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:plan"
+  short_description: "要件と既存実装から実装プランを作成する"
+  default_prompt: "要件と既存コードを調査し、実装プランを作成してください。"
+
+policy:
+  allow_implicit_invocation: true

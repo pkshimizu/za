@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:merge"
+  short_description: "レビュー済み PR を確認してマージする"
+  default_prompt: "PR の状態を確認し、安全にマージしてください。"
+
+policy:
+  allow_implicit_invocation: true

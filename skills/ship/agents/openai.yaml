@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:ship"
+  short_description: "issue の実装から PR レビューまで完遂する"
+  default_prompt: "GitHub issue の実装から PR 作成、レビュー収束まで行ってください。"
+
+policy:
+  allow_implicit_invocation: true

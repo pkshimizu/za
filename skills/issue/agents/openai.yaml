@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:issue"
+  short_description: "実装プランから GitHub issue を作成する"
+  default_prompt: "実装プランを読み、GitHub issue を作成してください。"
+
+policy:
+  allow_implicit_invocation: true

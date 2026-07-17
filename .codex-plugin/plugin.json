@@ -1,0 +1,36 @@
+{
+  "name": "za",
+  "version": "0.1.0",
+  "description": "要件確認から実装、PR、レビュー、マージまでを支援する開発ワークフロー",
+  "author": {
+    "name": "shimizu.kenji",
+    "email": "shimizu.kenji@noncore.net",
+    "url": "https://github.com/pkshimizu"
+  },
+  "homepage": "https://github.com/pkshimizu/za",
+  "repository": "https://github.com/pkshimizu/za",
+  "keywords": [
+    "development",
+    "github",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "za",
+    "shortDescription": "開発ワークフロー支援スキル集",
+    "longDescription": "要件確認、実装プラン、GitHub issue、実装、PR、レビュー、マージまでの開発フローを支援します。",
+    "developerName": "shimizu.kenji",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/pkshimizu/za",
+    "defaultPrompt": [
+      "この要件の実装プランを作成してください",
+      "この issue を解決してください",
+      "この PR をレビューしてください"
+    ],
+    "brandColor": "#111827"
+  }
+}

@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:review"
+  short_description: "GitHub PR を観点別にレビューして修正する"
+  default_prompt: "GitHub PR を観点別にレビューし、必要な修正を行ってください。"
+
+policy:
+  allow_implicit_invocation: true

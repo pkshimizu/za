@@ -1,6 +1,6 @@
 # za
 
-開発支援のための Claude Code プラグイン。
+開発支援のための Claude Code / Codex プラグイン。
 
 ## 収録スキル
 
@@ -39,10 +39,22 @@
 
 このリポジトリはプラグイン本体であると同時に marketplace を兼ねている。
 
+### Claude Code
+
 ```sh
 claude plugin marketplace add pkshimizu/za
 claude plugin install za@za
 ```
+
+### Codex
+
+```sh
+codex plugin marketplace add pkshimizu/za
+codex plugin add za@za
+```
+
+Codex では、依頼内容が各スキルの `description` と一致するとスキルが自動的に選択される。
+明示的に呼び出す場合は、`$za:plan` のように `$za:<skill-name>` を指定する。
 
 ## ローカル開発
 

@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:hunk-resolve"
+  short_description: "hunk のレビューコメントを一括で解決する"
+  default_prompt: "hunk のレビューコメントを確認し、修正からコミットまで行ってください。"
+
+policy:
+  allow_implicit_invocation: true
