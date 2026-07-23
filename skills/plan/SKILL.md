@@ -1,5 +1,7 @@
 ---
 name: plan
+model: fable
+effort: high
 description: >-
   開発要件を確認し、プロジェクトのコンテキストと既存実装を踏まえた実装プランを
   docs/plans/ に作成する。要件を起点に docs/CONTEXT.md と docs/PLAN.md を読み込み、

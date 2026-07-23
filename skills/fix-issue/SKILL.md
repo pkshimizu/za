@@ -1,5 +1,7 @@
 ---
 name: fix-issue
+model: opus
+effort: medium
 description: >-
   指定された GitHub issue の内容を確認し、プロジェクトの実装ルールに従って実装し、
   作業ブランチを切ってコミットするところまでを行う。引数で issue 番号（例: /za:fix-issue 42）

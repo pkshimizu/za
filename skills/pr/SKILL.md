@@ -1,5 +1,7 @@
 ---
 name: pr
+model: sonnet
+effort: low
 description: >-
   現在の作業ブランチの変更内容を git 履歴から確認し、プロジェクトの docs/PR.md の
   ルールに従って GitHub プルリクエストを作成し、その URL を報告する。base ブランチとの

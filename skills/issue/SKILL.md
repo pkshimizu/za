@@ -1,5 +1,7 @@
 ---
 name: issue
+model: sonnet
+effort: medium
 description: >-
   実装プランのファイルを読み込み、その内容から GitHub issue を作成する。引数で指定された
   プランファイル（例: docs/plans/20260607-add-login.md）を読み、プロジェクトの

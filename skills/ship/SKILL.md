@@ -1,5 +1,8 @@
 ---
 name: ship
+# model / effort は意図的に設定しない。ship は fix-issue → pr → review を Skill ツールで
+# 順に呼び出すオーケストレーターであり、各フェーズではそのサブスキル側の model / effort
+# 設定が適用される。ここで指定するとその意図的な使い分けを上書きしてしまう。
 description: >-
   指定された GitHub issue を起点に、za:fix-issue（実装・コミット）→ za:pr（PR 作成）→
   za:review（観点別レビューと修正）を途中の確認なしで通しで実行し、レビュー収束済みの

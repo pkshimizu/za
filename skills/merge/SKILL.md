@@ -1,5 +1,7 @@
 ---
 name: merge
+model: haiku
+effort: low
 description: >-
   レビューが完了した GitHub プルリクエストをマージし、デフォルトブランチに戻して最新化する。
   マージ前にレビュー承認・CI・コンフリクトの状態を確認し、外部操作なので承認を得てから

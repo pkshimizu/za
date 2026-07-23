@@ -1,5 +1,7 @@
 ---
 name: resolve-issue
+model: fable
+effort: high
 description: >-
   指定された GitHub issue を読み込み、内容に潜む不明点・未決定事項を洗い出して、
   対応方針をユーザーと確認・確定する。コードや既存ドキュメントで解消できるものは自分で

@@ -1,5 +1,7 @@
 ---
 name: hunk-resolve
+model: opus
+effort: medium
 description: >-
   hunk (ターミナルの diff レビューア) の全レビューコメントを取得し、各コメントの意図を
   汲んでコード修正まで対応する。全コメントの対応が終わったら、コメントごとの対応内容を

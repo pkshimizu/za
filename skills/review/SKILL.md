@@ -1,5 +1,7 @@
 ---
 name: review
+model: opus
+effort: high
 description: >-
   指定された GitHub プルリクエストを、プロジェクトの docs/review-perspectives/ にある
   レビュー観点ごとに並列のサブエージェントでレビューし、指摘の修正→再レビューを指摘が

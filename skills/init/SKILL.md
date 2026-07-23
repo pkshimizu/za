@@ -1,5 +1,7 @@
 ---
 name: init
+model: sonnet
+effort: medium
 description: >-
   za プラグインの各スキル（plan / issue / fix-issue / pr / review）が参照するドキュメントを
   プロジェクトの docs/ 配下に用意する初期化スキル。docs/CONTEXT.md・docs/PLAN.md・
