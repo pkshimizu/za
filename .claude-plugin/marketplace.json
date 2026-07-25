@@ -22,7 +22,10 @@
         "./skills/fix-issue",
         "./skills/pr",
         "./skills/review",
-        "./skills/merge"
+        "./skills/ship",
+        "./skills/cross-ship",
+        "./skills/merge",
+        "./skills/hunk-resolve"
       ]
     }
   ]
