@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["findings", "summary"],
+  "properties": {
+    "summary": {
+      "type": "string",
+      "description": "レビュー全体の要約。指摘が無い場合は指摘なしと判断した根拠を書く。"
+    },
+    "findings": {
+      "type": "array",
+      "description": "指摘の一覧。指摘が無ければ空配列。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "severity",
+          "perspective",
+          "location",
+          "problem",
+          "rationale",
+          "suggestion"
+        ],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["blocker", "major", "minor", "nit"],
+            "description": "重要度。"
+          },
+          "perspective": {
+            "type": "string",
+            "description": "どのレビュー観点に基づく指摘か（観点ファイル名か観点名）。"
+          },
+          "location": {
+            "type": "string",
+            "description": "<ファイルパス>:<行>。範囲なら <パス>:<開始>-<終了>。"
+          },
+          "problem": {
+            "type": "string",
+            "description": "何が問題か。"
+          },
+          "rationale": {
+            "type": "string",
+            "description": "なぜ問題か。観点ファイル・規約・一般原則への参照。"
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "どう直すか。"
+          }
+        }
+      }
+    }
+  }
+}
