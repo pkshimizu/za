@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:cross-review"
+  short_description: "GitHub PR を Claude と Codex の 2 モデルでレビューして修正する"
+  default_prompt: "GitHub PR を Claude と Codex の両方でクロスレビューし、指摘の修正まで行ってください。"
+
+policy:
+  allow_implicit_invocation: true

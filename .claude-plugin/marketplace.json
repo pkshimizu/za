@@ -22,6 +22,7 @@
         "./skills/fix-issue",
         "./skills/pr",
         "./skills/review",
+        "./skills/cross-review",
         "./skills/ship",
         "./skills/cross-ship",
         "./skills/merge",
