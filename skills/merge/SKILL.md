@@ -6,7 +6,6 @@ description: >-
   レビューが完了した GitHub プルリクエストをマージし、デフォルトブランチに戻して最新化する。
   マージ前にレビュー承認・CI・コンフリクトの状態を確認し、外部操作なので承認を得てから
   マージする。マージ後は head ブランチを削除し、デフォルトブランチへ切り替えて pull する。
-  za:ship が作った git worktree があれば、それも後片付けする。
   PR に積み残しのタスクがある場合は issue 化（/za:issue など）を案内する。引数で PR 番号/URL
   を受け取り、無ければ現在ブランチの PR または一覧から確認する。ユーザーが「この PR をマージ
   して」「プルリクをマージして」「#42 をマージ」「マージして次へ」などと言ったとき、または
@@ -78,8 +77,6 @@ description: >-
 - 対象 PR（番号・タイトル）と base ← head
 - レビュー・CI・コンフリクトの状態（手順2の結果）
 - マージ方法（squash / merge / rebase）と head ブランチ削除の有無
-- head ブランチが git worktree にチェックアウトされている場合は、その worktree も削除する
-  こと（`git worktree list` で確認する。`za:ship` は worktree で作業するため通常は存在する）
 
 「この内容でマージしてよいか」を確認する。
 （ユーザーが事前に「確認不要、そのままマージ」と明示している場合は省いてよい。）
@@ -96,29 +93,9 @@ gh pr merge <番号> --squash --delete-branch   # 方法は手順3で決めた�
 - マージに失敗した場合（保護ルール・チェック未達・権限など）は、強制的な回避策を取らず、
   失敗内容をそのまま報告して確認する。
 
-### 6. worktree を片付け、デフォルトブランチに戻して最新化する
+### 6. デフォルトブランチに戻して最新化する
 
-マージ後、`za:ship` が作った worktree を片付けてから、ローカルをデフォルトブランチに戻す。
-
-**worktree の後片付け**（`git worktree list` に head ブランチの worktree がある場合）:
-
-- head ブランチが worktree にチェックアウトされている間は、そのブランチをローカルから
-  削除できない。`gh pr merge --delete-branch` がローカル削除に失敗するのはこのためで、
-  リモート側のマージ・削除自体は成功している。worktree を消してからブランチを消す。
-- 現在のセッションが `EnterWorktree` で入った worktree の中にいる場合は、`ExitWorktree` を
-  `action: "remove"` で呼ぶ（本体ディレクトリへ戻り、worktree とブランチを削除する）。
-  未コミットの変更や未マージのコミットがあると拒否されるので、その場合は**破棄せず**
-  内容を提示してユーザーに確認する。
-- `za:ship` は worktree 作成後にブランチを規約名へ改名するため、`ExitWorktree` が
-  ブランチまでは消せないことがある。worktree が消えたあとに `git branch --list <head>` で
-  残っていないか確認し、残っていれば削除する。
-- 手動で `git worktree add` した worktree は `ExitWorktree` では消えない。
-  `git worktree remove <パス>`（必要なら `git worktree prune`）→ `git branch -d <head>`
-  の順で片付ける。
-- worktree に置いた依存パッケージのコピー（`node_modules` 等）も一緒に消える。本体側には
-  影響しない。symlink で共有した `docs/` 等は、リンクが消えるだけで実体は残る。
-
-**デフォルトブランチへ**:
+マージ後、ローカルをデフォルトブランチに戻す。
 
 - デフォルトブランチを確認する
   （`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）。
@@ -145,6 +122,5 @@ gh pr merge <番号> --squash --delete-branch   # 方法は手順3で決めた�
 次を報告する:
 
 - **マージ結果**: マージした PR（番号・タイトル）・マージ方法・削除した head ブランチ
-- **現在の状態**: 削除した worktree（あれば）、切り替えたデフォルトブランチと最新化
-  （pull）の結果
+- **現在の状態**: 切り替えたデフォルトブランチと最新化（pull）の結果
 - **積み残し**: issue 化した／案内した内容、または「積み残しなし」
