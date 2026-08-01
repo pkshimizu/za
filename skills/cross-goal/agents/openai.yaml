@@ -1,5 +1,5 @@
 interface:
-  display_name: "za:cross-ship"
+  display_name: "za:cross-goal"
   short_description: "issue の実装から Claude と Codex のクロスレビューまで完遂する"
   default_prompt: "GitHub issue の実装から PR 作成、Claude と Codex のクロスレビュー収束まで行ってください。"
 

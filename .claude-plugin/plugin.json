@@ -16,8 +16,8 @@
     "./skills/pr",
     "./skills/review",
     "./skills/cross-review",
-    "./skills/ship",
-    "./skills/cross-ship",
+    "./skills/goal",
+    "./skills/cross-goal",
     "./skills/merge",
     "./skills/hunk-resolve"
   ]

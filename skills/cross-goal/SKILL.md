@@ -1,23 +1,24 @@
 ---
-name: cross-ship
-# model / effort は意図的に設定しない。cross-ship は fix-issue → pr → cross-review を Skill
+name: cross-goal
+# model / effort は意図的に設定しない。cross-goal は fix-issue → pr → cross-review を Skill
 # ツールで順に呼び出すオーケストレーターであり、各フェーズではそのサブスキル側の
 # model / effort 設定が適用される。ここで指定するとその意図的な使い分けを上書きしてしまう。
 description: >-
   指定された GitHub issue を起点に、za:fix-issue（実装・コミット）→ za:pr（PR 作成）→
   za:cross-review（Claude と Codex の 2 モデルによるクロスレビューと修正）を、途中の確認なしで
-  通しで実行する。za:ship と同じ通しフローだが、レビューを Claude 単独ではなく 2 モデルで
-  行う点が違う。引数で issue 番号（例: /za:cross-ship 42）を受け取る。マージはしない
+  通しで実行する。za:goal と同じ通しフローだが、レビューを Claude 単独ではなく 2 モデルで
+  行う点が違う。引数で issue 番号（例: /za:cross-goal 42）を受け取る。マージはしない
   （/za:merge を案内する）。ユーザーが「この issue を Claude と Codex の両方でレビューして
   仕上げて」「codex にもレビューさせて通しでやって」「二重レビューで PR まで仕上げて」
-  「クロスレビューで出荷して」などと言ったとき、または /za:cross-ship を実行したときに使う。
-  レビューの見落としを減らして issue 対応を一気通貫で終わらせたい話が出たら積極的に使う。
+  「クロスレビューでゴールまで持っていって」などと言ったとき、または /za:cross-goal を
+  実行したときに使う。レビューの見落としを減らして issue 対応を一気通貫で終わらせたい話が
+  出たら積極的に使う。
 ---
 
-# za:cross-ship — issue を実装し、Claude と Codex のクロスレビューで仕上げる
+# za:cross-goal — issue を実装し、Claude と Codex のクロスレビューで仕上げる
 
 GitHub issue を起点に、実装から「レビュー収束済みの PR」までを**途中の確認なしに**通しで
-実行する。`za:ship` との違いは**レビューを 2 モデルで行うこと**だけ。
+実行する。`za:goal` との違いは**レビューを 2 モデルで行うこと**だけ。
 
 1. `za:fix-issue` — issue の実装とコミット
 2. `za:pr` — PR の作成
@@ -70,7 +71,7 @@ command -v claude && claude --version && claude auth status  # Codex で実行�
 ## ユーザー確認の扱い（このフローでの上書きルール）
 
 呼び出す各スキルには「ユーザーに確認する」ステップがあるが、この通し実行では**確認のために
-停止しない**。`za:ship` と同じルールで進める:
+停止しない**。`za:goal` と同じルールで進める:
 
 - **推奨案がある確認**（PR 作成の承認、実装方針の選択など）: 自分が推奨する案をそのまま
   採用して先へ進み、**判断ログ**に記録する。
@@ -89,7 +90,7 @@ command -v claude && claude --version && claude auth status  # Codex で実行�
 
 ## 判断ログ
 
-通し実行中に自動採用した判断を、その場で記録して最後にまとめて出力する。形式は `za:ship`
+通し実行中に自動採用した判断を、その場で記録して最後にまとめて出力する。形式は `za:goal`
 と同じ:
 
 ```
