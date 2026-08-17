@@ -6,6 +6,10 @@
 
 - **`/za:init`** — za の各スキルが参照する `docs/CONTEXT.md`・`docs/PLAN.md`・`docs/ISSUE.md`・
   `docs/PR.md` をプロジェクトに作成する。CONTEXT.md はリポジトリ調査で中身を埋める。
+- **`/za:index`** — 既存の `docs/rules/` と `docs/review-perspectives/` を調査し、それぞれに
+  `INDEX.md`（1 行 1 ファイルの索引: 要約・適用条件・`paths`）を生成する。`/za:fix-issue` と
+  `/za:review` はこの索引を先に読み、今回の実装・差分に関係するファイルだけを開く。索引が
+  無ければ全ファイル読み込みへ縮退するので、導入は任意（ファイルが増えてきたら効く）。
 - **`/za:plan`** — 開発要件を確認し、プロジェクトのコンテキスト（`docs/CONTEXT.md`）と
   既存コードを踏まえた実装プランを `docs/plans/{yyyymmdd}-{title}.md` に作成する。
   不明点はまずコード調査で解消し、残ったものだけをユーザーに質問する。
