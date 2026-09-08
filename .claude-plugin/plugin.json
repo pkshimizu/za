@@ -20,6 +20,7 @@
     "./skills/goal",
     "./skills/cross-goal",
     "./skills/merge",
+    "./skills/release",
     "./skills/hunk-resolve"
   ]
 }

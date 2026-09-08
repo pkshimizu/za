@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:release"
+  short_description: "リリース前チェックを通してから本番リリースする"
+  default_prompt: "docs/RELEASE.md のリリース前チェックを実行し、すべて通ったらリリース PR の内容を提示してください。PR 作成とマージはそれぞれ承認を得てから行ってください。"
+
+policy:
+  allow_implicit_invocation: false
