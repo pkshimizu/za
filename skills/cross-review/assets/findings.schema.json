@@ -1,7 +1,12 @@
 {
   "type": "object",
   "additionalProperties": false,
-  "required": ["findings", "summary"],
+  "required": [
+    "summary",
+    "findings",
+    "resolutions",
+    "notes_only"
+  ],
   "properties": {
     "summary": {
       "type": "string",
@@ -9,7 +14,7 @@
     },
     "findings": {
       "type": "array",
-      "description": "指摘の一覧。指摘が無ければ空配列。",
+      "description": "指摘の一覧。指摘が無ければ空配列。2 ラウンド目以降は、再現手順（repro）を書ける新しい blocker だけを入れる。",
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -19,12 +24,18 @@
           "location",
           "problem",
           "rationale",
-          "suggestion"
+          "suggestion",
+          "repro"
         ],
         "properties": {
           "severity": {
             "type": "string",
-            "enum": ["blocker", "major", "minor", "nit"],
+            "enum": [
+              "blocker",
+              "major",
+              "minor",
+              "nit"
+            ],
             "description": "重要度。"
           },
           "perspective": {
@@ -46,8 +57,54 @@
           "suggestion": {
             "type": "string",
             "description": "どう直すか。"
+          },
+          "repro": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "再現手順、または落ちるテスト。2 ラウンド目以降の blocker では必須（書けない指摘は出さない）。1 ラウンド目は null。"
           }
         }
+      }
+    },
+    "resolutions": {
+      "type": "array",
+      "description": "前ラウンドの指摘ごとの解消判定。1 ラウンド目は空配列。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "finding_id",
+          "verdict",
+          "evidence"
+        ],
+        "properties": {
+          "finding_id": {
+            "type": "string",
+            "description": "前ラウンドの指摘に振られた番号（プロンプトで渡されたもの）。"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "unresolved",
+              "worsened"
+            ],
+            "description": "解消 / 未解消 / 悪化。"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "判定の根拠を 1〜2 行。未解消・悪化なら、何がどう残っている・悪くなったか。"
+          }
+        }
+      }
+    },
+    "notes_only": {
+      "type": "array",
+      "description": "直す対象にしない「記録のみ」の指摘を 1 行ずつ。1 ラウンド目は空配列。",
+      "items": {
+        "type": "string"
       }
     }
   }
