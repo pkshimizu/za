@@ -154,7 +154,7 @@ OUT="$(mktemp -t codex-review-XXXXXX).json"
       --output-schema "$SCHEMA" \
       -o "$OUT" -
 
-cat "$OUT"   # {"summary": "...", "findings": [...]}
+cat "$OUT"   # {"summary": "...", "findings": [...], "resolutions": [...], "notes_only": [...]}
 ```
 
 各オプションの理由（すべて実機で確認済み）:
@@ -183,7 +183,7 @@ OUT="$(mktemp -t claude-review-XXXXXX).json"
       --output-format json --json-schema "$(cat "$SCHEMA")" \
       --tools "Read,Grep,Glob" --permission-mode dontAsk > "$OUT"
 
-jq -c '.structured_output' "$OUT"   # {"summary": "...", "findings": [...]}
+jq -c '.structured_output' "$OUT"   # {"summary": "...", "findings": [...], "resolutions": [...], "notes_only": [...]}
 ```
 
 各オプションの理由（すべて実機で確認済み）:
@@ -213,7 +213,9 @@ jq -c '.structured_output' "$OUT"   # {"summary": "...", "findings": [...]}
   でその番号を返す）
 - 出力の指示を「`findings` には再現手順（`repro`）を書ける新しい blocker だけ、`resolutions` に
   前ラウンドの指摘ごとの判定、`notes_only` に記録のみを 1 行ずつ」に変える。
-  `assets/findings.schema.json` はこれらを任意項目として持つ（1 ラウンド目は空でよい）
+  `assets/findings.schema.json` はこれらを必須項目として持つ（1 ラウンド目は `resolutions` /
+  `notes_only` を空配列、`repro` を null で返させる。任意項目にすると codex の strict モードで
+  schema ごと拒否される）
 
 呼び出しが失敗した場合（非 0 終了、`.is_error` が true、JSON が壊れている等）は 1 回だけ
 再試行し、それでも失敗するなら**手順 2 の縮退と同じ扱い**にする。すなわち、失敗した事実を
