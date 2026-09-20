@@ -1,7 +1,12 @@
 {
   "type": "object",
   "additionalProperties": false,
-  "required": ["findings", "summary"],
+  "required": [
+    "summary",
+    "findings",
+    "resolutions",
+    "notes_only"
+  ],
   "properties": {
     "summary": {
       "type": "string",
@@ -19,12 +24,18 @@
           "location",
           "problem",
           "rationale",
-          "suggestion"
+          "suggestion",
+          "repro"
         ],
         "properties": {
           "severity": {
             "type": "string",
-            "enum": ["blocker", "major", "minor", "nit"],
+            "enum": [
+              "blocker",
+              "major",
+              "minor",
+              "nit"
+            ],
             "description": "重要度。"
           },
           "perspective": {
@@ -48,19 +59,26 @@
             "description": "どう直すか。"
           },
           "repro": {
-            "type": "string",
-            "description": "再現手順、または落ちるテスト。2 ラウンド目以降の blocker では必須（書けない指摘は出さない）。1 ラウンド目は省略可。"
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "再現手順、または落ちるテスト。2 ラウンド目以降の blocker では必須（書けない指摘は出さない）。1 ラウンド目は null。"
           }
         }
       }
     },
     "resolutions": {
       "type": "array",
-      "description": "2 ラウンド目以降のみ。前ラウンドの指摘ごとの解消判定。1 ラウンド目は空配列か省略。",
+      "description": "前ラウンドの指摘ごとの解消判定。1 ラウンド目は空配列。",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["finding_id", "verdict", "evidence"],
+        "required": [
+          "finding_id",
+          "verdict",
+          "evidence"
+        ],
         "properties": {
           "finding_id": {
             "type": "string",
@@ -68,7 +86,11 @@
           },
           "verdict": {
             "type": "string",
-            "enum": ["resolved", "unresolved", "worsened"],
+            "enum": [
+              "resolved",
+              "unresolved",
+              "worsened"
+            ],
             "description": "解消 / 未解消 / 悪化。"
           },
           "evidence": {
@@ -80,8 +102,10 @@
     },
     "notes_only": {
       "type": "array",
-      "description": "2 ラウンド目以降のみ。直す対象にしない「記録のみ」の指摘を 1 行ずつ。1 ラウンド目は空配列か省略。",
-      "items": { "type": "string" }
+      "description": "直す対象にしない「記録のみ」の指摘を 1 行ずつ。1 ラウンド目は空配列。",
+      "items": {
+        "type": "string"
+      }
     }
   }
 }
