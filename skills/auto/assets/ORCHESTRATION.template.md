@@ -98,7 +98,10 @@ PR 本文の確認事項（チェックボックス）はゲートに使われ�
 
 - `needs_decision` の issue: ボードの `Backlog` をラベルで絞る
 - `needs_manual_check` の PR、人に回された PR: ボードの `In review`。出口は `/za:merge` で
-  マージするか、原因を解消して（ラベルを外す等）`Ready` に戻す（次の起動で再判定される）
+  マージするか、原因を解消して（ラベルを外す等）`Ready` に戻す（次の起動で再判定される）。
+  ただし収束マーカーが無い PR と、ゲート自体（`docs/ORCHESTRATION.md` 等）を変える PR は
+  `Ready` に戻しても再保留されるので、出口は `/za:merge` だけ。`/za:merge` 後に issue が
+  閉じなければ（PR に `Closes` が無い）、issue を手で閉じると次の起動で `Done` に移る
 - `za:auto` が残したコメント（`za:auto:` で始まる）: 着手・収束・保留・失敗の記録
 
 ## 自動運転を止めたいとき
