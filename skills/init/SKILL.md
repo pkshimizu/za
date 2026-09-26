@@ -66,6 +66,8 @@ CONTEXT.md は中身が肝なので、空テンプレートを置くだけにし
 - **PR.md の「確認事項」**は、プロジェクトの実際のビルド/テストコマンドに合わせて具体化する
   （例: Rust なら `cargo build` / `cargo clippy` / `cargo test`、Node なら `npm run build` /
   `npm test` 等）。ステップ3の調査結果から判断する。
+- **PR.md の「base ブランチ」**は、ひな形では `main`。リリースブランチ運用（`main` ← `develop` ←
+  feature）なら `develop` に変える。`za:pr` / `za:fix-issue` がここを読んで base と分岐元を決める。
 - 他の箇所は基本そのままでよいが、プロジェクトの実情と明らかに異なる記述があれば調整する。
 
 ### 5. 完了報告

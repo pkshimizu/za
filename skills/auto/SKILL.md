@@ -45,9 +45,11 @@ description: >-
 `git push --force`、`gh pr merge --admin` など、履歴や保護を迂回する操作は行わない。
 機械の判断をボードに書くときは、必ず issue コメントに理由を残す（人が後から追えるように）。
 
-マージ先は `docs/MERGE.md` の base に従う。現時点では `za:fix-issue` / `za:pr` がデフォルト
-ブランチを base に取るので、実質デフォルトブランチ向けになる。リリースブランチ（`develop` 等）
-を base にする運用は、`za:pr` が base を `docs/PR.md` から読むようになってから（別 issue）。
+マージ先は `docs/MERGE.md` の base。`za:fix-issue` / `za:pr` は `docs/PR.md` の base から
+分岐して PR を作るので、この 2 つは一致していなければならない（手順 0 で検証する）。
+推奨する運用は base をリリースブランチ（`develop` 等）にすること。`za:auto` の影響が
+リリースブランチに閉じ、デフォルトブランチへのリリースは `za:release`（人が承認する）が担う。
+以下「base」はこのブランチを指す。
 
 ## 前提
 
@@ -56,7 +58,8 @@ description: >-
   項目が欠ける場合は何もせず止まる。** 既定値で動かない（ボード番号やラベル名を推測で補うと、
   違う issue を触る）。
 - **CI は必須。** `.github/workflows/` にワークフローが無ければ起動しない（設定では緩められない）。
-- 設定は手順 0 で**デフォルトブランチの版を 1 回だけ読み、その起動中は固定**する。
+- 設定は手順 0 で **base 上の版を 1 回だけ読み、その起動中は固定**する（base に入る設定変更は、
+  ゲート 3 により必ず人がマージしている）。
 - サブスキル（`za:goal` / `za:issue`）が「停止して報告する」と書いている場面も、`za:auto` の
   手順は続く（Skill ツールは同じ文脈に手順を注入するだけなので）。サブスキルの報告を読み、
   手順 4 の判定へ進む。サブスキルが人の確認を求める場面は、末尾の表のとおり**人に回す**。
@@ -69,20 +72,24 @@ description: >-
 
 1 つでも欠けたら、ボードにも issue にも何も書かずに止まる。
 
-1. `git status --porcelain` が空、かつ現在ブランチがデフォルトブランチ
-   （`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）であること。
+1. `git status --porcelain` が空、かつ現在ブランチが base（`docs/PR.md` の「base ブランチ」節。
+   無ければデフォルトブランチ `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）
+   であること。
    作業ブランチに残っている場合は、前回の途中終了なので**止まる**（手で戻し、不要な作業ブランチを
    消してから再実行するよう案内する）。`git fetch origin` → `git pull --ff-only`。
-2. `git show origin/<default>:docs/ORCHESTRATION.md` と `docs/MERGE.md` を読み、次をすべて解決する:
+2. base を決める（`docs/PR.md` の「base ブランチ」節。無ければデフォルトブランチ）。
+   `git show origin/<base>:docs/ORCHESTRATION.md` と同じく `docs/MERGE.md` を読み、次をすべて解決する:
    - ボード: `gh project view <project> --owner <owner> --format json -q .id` で **project id**（`PVT_…`）
    - Status の **field id** と 5 つの **option id**（`gh project field-list <project> --owner <owner>
      --format json`。設定の値名と一致する option が 5 つとも見つかること）。`priority_field` が
      あればその field id も
    - ラベル `needs_decision` / `needs_manual_check` が `gh label list` に**実在する**こと
-   - `.github/workflows/*.yml` または `*.yaml` がデフォルトブランチに 1 つ以上あること
+   - `.github/workflows/*.yml` または `*.yaml` が base に 1 つ以上あること
    - 上限（`max_per_run` / `max_failures` / `ci_timeout_minutes` / `max_leftover_issues`）、
      `protected_paths`、`require_milestone`、任意の `manual_check_paths` / `test_paths`
-   - `docs/MERGE.md` の base・マージ方法・head の扱い・マージの前提
+   - `docs/MERGE.md` の base・マージ方法・head の扱い・マージの前提。**`docs/MERGE.md` の base と
+     `docs/PR.md` の base が一致**すること（違えば止まる。`za:pr` が作る PR の base とマージ先が
+     ずれる）。base が `origin` に存在すること
 3. ボード全件を取得する: `gh project item-list <project> --owner <owner> --format json --limit 500`。
    返却が 500 件に達したら（取りこぼしの可能性）止まる。各 item は `id` / `status` / `priority` /
    `labels` / `content.number` / `content.body` / `content.repository` を持つ（**`content` に issue の
@@ -156,15 +163,15 @@ description: >-
 
 #### 4-a. 候補を切り替える前の後始末
 
-失敗・不合格・保留で次の候補へ進む前に、必ずデフォルトブランチのきれいな状態に戻す。
+失敗・不合格・保留で次の候補へ進む前に、必ず base のきれいな状態に戻す。
 `za:goal` は作業ブランチに居るまま終わり、途中で落ちると未コミット変更が残る。
 
 ```sh
-git reset --hard && git switch <default> && git pull --ff-only
+git reset --hard && git switch <base> && git pull --ff-only
 git branch -D <作業ブランチ>      # 失敗した試行の変更は捨ててよい（PR があればリモートに残る）
 ```
 
-戻したあと `git status --porcelain` が空でデフォルトブランチであることを再検証する。満たせなければ
+戻したあと `git status --porcelain` が空で base にいることを再検証する。満たせなければ
 `kind=env` としてこの起動を止める（汚れたツリーで次の issue を始めると、無関係な issue に失敗が
 積まれる）。
 
@@ -221,7 +228,7 @@ PR は `In review` にある。次をすべて満たすかを見る。判定の�
   ゲート判定後に head が進んでいたら拒否される → 保留（人に回す）
 - 保護ルールで拒否された → issue の責任ではないので、マーカーを付けずに**この起動を止める**
   （設定か権限の問題）。それ以外の失敗は `kind=env`
-- マージ後、`git switch <default>` → `git pull --ff-only`。PR が MERGED であることを
+- マージ後、`git switch <base>` → `git pull --ff-only`。PR が MERGED であることを
   `gh pr view --json state` で確認してから、ローカルの作業ブランチを `git branch -D` で消す
 
 ### 7. `Done` にして、依存が解けた issue を昇格する
@@ -303,12 +310,13 @@ za:auto: <日時> <どの手順で・何が起きたか・次に人が見るべ�
 - `docs/ORCHESTRATION.md` / `docs/MERGE.md` が無い、必須項目が欠ける、ラベル・Status・CI が
   実在しない（手順 0）
 - 作業ツリーに未コミット変更がある、または作業ブランチに残っている（手順 0・4-a）
+- `docs/PR.md` と `docs/MERGE.md` の base が食い違う、base が `origin` に無い（手順 0）
 - `Ready` に対象が 1 件も無い。残りが `needs_decision` / `needs_manual_check` だけの場合も含む
 - 同じ issue の失敗が `max_failures` に達した
 - 環境起因（`kind=env`）の失敗、CI が走っていない、保護ルールでマージが拒否された
 - 処理件数が `max_per_run` に達した
 
-起動を止めるときも、手順 3 以降にいるなら先に 4-a を通してデフォルトブランチのきれいな状態に
+起動を止めるときも、手順 3 以降にいるなら先に 4-a を通して base のきれいな状態に
 戻す（戻せなかった場合だけ、手順 0 の前提不成立として次の起動が止まる）。
 
 継続運転している場合、この起動が止まっても次の起動は走る。上の理由が解消しない限り次も同じ

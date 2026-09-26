@@ -8,7 +8,12 @@
 
 ## base ブランチ
 
-`main` に向けて作成する。作業ブランチは `feature/{issue番号}-{title}`（`za:fix-issue` が作る）。
+`main`
+
+PR の base であり、`za:fix-issue` が作業ブランチを切る分岐元。**この節の最初のバッククォートで
+囲んだ名前**を `za:pr` / `za:fix-issue` が読む。リリースブランチ運用（`main` ← `develop` ←
+feature）なら `develop` と書く。`docs/MERGE.md` の base と一致させる（食い違うと `za:pr` は
+止まる）。作業ブランチは `feature/{issue番号}-{title}`（`za:fix-issue` が作る）。
 
 ## タイトル
 
