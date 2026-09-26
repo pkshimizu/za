@@ -77,6 +77,7 @@ description: >-
 - 対象 PR（番号・タイトル）と base ← head
 - レビュー・CI・コンフリクトの状態（手順2の結果）
 - マージ方法（squash / merge / rebase）と head ブランチ削除の有無
+- マージ後に閉じる issue（PR の base がデフォルトブランチでなく、`Closes #N` がある場合。手順 5）
 
 「この内容でマージしてよいか」を確認する。
 （ユーザーが事前に「確認不要、そのままマージ」と明示している場合は省いてよい。）
@@ -92,10 +93,15 @@ gh pr merge <番号> --squash --delete-branch   # 方法は手順3で決めた�
 
 - マージに失敗した場合（保護ルール・チェック未達・権限など）は、強制的な回避策を取らず、
   失敗内容をそのまま報告して確認する。
-- **PR の base がデフォルトブランチでない場合**（リリースブランチ運用）、本文の `Closes #N` は
-  自動クローズされない。マージ後に `gh issue view <N> --json state` で確認し、OPEN なら
-  `gh issue close <N> --reason completed --comment "<PR URL> をマージ"` で閉じる（承認済みの
-  マージに付随する処理なので、改めて確認は求めない）。
+- **PR の base が `docs/PR.md` の base ブランチ（決め方は `za:pr` 手順 1）と一致し、かつそれが
+  デフォルトブランチ（`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）でない
+  場合**（リリースブランチ運用）、本文の `Closes #N` は自動クローズされない。マージ後に
+  `gh issue view <N> --json state` で確認し、OPEN なら
+  `gh issue close <N> --reason completed --comment "<PR URL> をマージ"` で閉じる。N は
+  `gh pr view <番号> --json body` の本文にある `Closes #N`（同リポジトリの番号のみ）から取る。
+  手順 4 で「マージ後に閉じる issue」として提示済みなので、改めて確認は求めない。
+  **base がそれ以外（スタック PR の親ブランチなど）の場合は閉じない**。変更はまだ base にも
+  デフォルトブランチにも入っていないため。「issue は自動クローズされない」と報告だけする。
 
 ### 6. base に戻して最新化する
 

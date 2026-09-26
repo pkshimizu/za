@@ -73,7 +73,8 @@ description: >-
 
 1 つでも欠けたら、ボードにも issue にも何も書かずに止まる。
 
-1. base を決め、`git status --porcelain` が空、かつ現在ブランチが base であること。
+1. base を決め（決め方は冒頭の注記。読み元は作業ツリーの `docs/PR.md`）、`git status --porcelain` が
+   空、かつ現在ブランチが base であること。
    作業ブランチに残っている場合は、前回の途中終了なので**止まる**（手で base に戻し、不要な
    作業ブランチを消してから再実行するよう案内する）。`git fetch origin` → `git pull --ff-only`。
 2. `git show origin/<base>:docs/ORCHESTRATION.md` と `git show origin/<base>:docs/MERGE.md` を
