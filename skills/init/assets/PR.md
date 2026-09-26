@@ -10,10 +10,9 @@
 
 `main`
 
-PR の base であり、`za:fix-issue` が作業ブランチを切る分岐元。**この節の最初のバッククォートで
-囲んだ名前**を `za:pr` / `za:fix-issue` が読む。リリースブランチ運用（`main` ← `develop` ←
-feature）なら `develop` と書く。`docs/MERGE.md` の base と一致させる（食い違うと `za:pr` は
-止まる）。作業ブランチは `feature/{issue番号}-{title}`（`za:fix-issue` が作る）。
+PR の base であり、`za:fix-issue` が作業ブランチを切る分岐元（この節の最初のバッククォートの
+名前が読まれる）。リリースブランチ運用なら `develop` などに変える。`docs/MERGE.md` の base と
+一致させる。作業ブランチは `feature/{issue番号}-{title}`（`za:fix-issue` が作る）。
 
 ## タイトル
 
@@ -30,7 +29,7 @@ feature）なら `develop` と書く。`docs/MERGE.md` の base と一致させ�
 - {主な変更点を箇条書き}
 
 ## 関連 issue
-- Closes #{番号}   （関連 issue があれば。マージで自動クローズさせる。無ければ省く）
+- Closes #{番号}   （関連 issue があれば。base がデフォルトブランチならマージで自動クローズされる。それ以外は za:merge / za:auto が閉じる。無ければ省く）
 
 ## 確認事項
 - [ ] {プロジェクトのビルドが通る}

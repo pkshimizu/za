@@ -29,6 +29,8 @@ description: >-
 
 本文の `Ready` / `Backlog` / `In progress` / `In review` / `Done` は、`docs/ORCHESTRATION.md` の
 役割名 ready / backlog / in_progress / in_review / done を指す。実際の表記は設定の値。
+本文の「base」は `docs/PR.md` の base ブランチ（無ければデフォルトブランチ。決め方は `za:pr`
+手順 1）を指す。
 
 ## マージの扱い
 
@@ -45,11 +47,10 @@ description: >-
 `git push --force`、`gh pr merge --admin` など、履歴や保護を迂回する操作は行わない。
 機械の判断をボードに書くときは、必ず issue コメントに理由を残す（人が後から追えるように）。
 
-マージ先は `docs/MERGE.md` の base。`za:fix-issue` / `za:pr` は `docs/PR.md` の base から
-分岐して PR を作るので、この 2 つは一致していなければならない（手順 0 で検証する）。
-推奨する運用は base をリリースブランチ（`develop` 等）にすること。`za:auto` の影響が
-リリースブランチに閉じ、デフォルトブランチへのリリースは `za:release`（人が承認する）が担う。
-以下「base」はこのブランチを指す。
+マージ先は base。`docs/MERGE.md` の base と `docs/PR.md` の base は一致していなければならない
+（手順 0 で検証する）。推奨する運用は base をリリースブランチ（`develop` 等）にすること。
+`za:auto` の影響がリリースブランチに閉じ、デフォルトブランチへのリリースは `za:release`
+（人が承認する）が担う。
 
 ## 前提
 
@@ -58,8 +59,8 @@ description: >-
   項目が欠ける場合は何もせず止まる。** 既定値で動かない（ボード番号やラベル名を推測で補うと、
   違う issue を触る）。
 - **CI は必須。** `.github/workflows/` にワークフローが無ければ起動しない（設定では緩められない）。
-- 設定は手順 0 で **base 上の版を 1 回だけ読み、その起動中は固定**する（base に入る設定変更は、
-  ゲート 3 により必ず人がマージしている）。
+- 設定は手順 0 で **base 上の版を 1 回だけ読み、その起動中は固定**する（設定を変える PR は
+  ゲート 3 で人に回るので、base 上の設定は必ず人がマージしたもの）。
 - サブスキル（`za:goal` / `za:issue`）が「停止して報告する」と書いている場面も、`za:auto` の
   手順は続く（Skill ツールは同じ文脈に手順を注入するだけなので）。サブスキルの報告を読み、
   手順 4 の判定へ進む。サブスキルが人の確認を求める場面は、末尾の表のとおり**人に回す**。
@@ -72,13 +73,11 @@ description: >-
 
 1 つでも欠けたら、ボードにも issue にも何も書かずに止まる。
 
-1. `git status --porcelain` が空、かつ現在ブランチが base（`docs/PR.md` の「base ブランチ」節。
-   無ければデフォルトブランチ `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）
-   であること。
-   作業ブランチに残っている場合は、前回の途中終了なので**止まる**（手で戻し、不要な作業ブランチを
-   消してから再実行するよう案内する）。`git fetch origin` → `git pull --ff-only`。
-2. base を決める（`docs/PR.md` の「base ブランチ」節。無ければデフォルトブランチ）。
-   `git show origin/<base>:docs/ORCHESTRATION.md` と同じく `docs/MERGE.md` を読み、次をすべて解決する:
+1. base を決め、`git status --porcelain` が空、かつ現在ブランチが base であること。
+   作業ブランチに残っている場合は、前回の途中終了なので**止まる**（手で base に戻し、不要な
+   作業ブランチを消してから再実行するよう案内する）。`git fetch origin` → `git pull --ff-only`。
+2. `git show origin/<base>:docs/ORCHESTRATION.md` と `git show origin/<base>:docs/MERGE.md` を
+   読み、次をすべて解決する（`origin/<base>` に無ければ、読み元を添えて止まる）:
    - ボード: `gh project view <project> --owner <owner> --format json -q .id` で **project id**（`PVT_…`）
    - Status の **field id** と 5 つの **option id**（`gh project field-list <project> --owner <owner>
      --format json`。設定の値名と一致する option が 5 つとも見つかること）。`priority_field` が
@@ -186,7 +185,8 @@ PR は `In review` にある。次をすべて満たすかを見る。判定の�
 2. **`needs_manual_check` が issue に付いていない。** 付いていれば保留（`hold reason=manual_check`。
    **成功扱い**で失敗には数えない。人が実機で確かめてからマージする）
 3. **PR の差分が人に回すパスに触れていない**（`gh pr diff <番号> --name-only`）:
-   `docs/ORCHESTRATION.md` / `docs/MERGE.md` / `.github/workflows/**` / 設定の `protected_paths`。
+   `docs/ORCHESTRATION.md` / `docs/MERGE.md` / `docs/PR.md` / `.github/workflows/**` / 設定の
+   `protected_paths`。
    触れていれば保留（`hold reason=protected_path`。ゲート自体と、ゲートが依存する検証手段の変更は
    人が見る）。設定に `test_paths` があれば、そこに当たるファイルの削除
    （`git diff --diff-filter=D --name-only origin/<base>...origin/<head>`）も同じ扱い。
