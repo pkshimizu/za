@@ -251,7 +251,8 @@ grep で済むので、必ずやる:
 
 - 繰り越した指摘がすべて「解消」で、新しい blocker が無ければ**収束**。
 - 上限は **3 周**（初回 + 再レビュー 2 周）。周は手順 4 のコミットで数える:
-  `git log <PR の base>..HEAD --grep='^review-round:' --oneline | wc -l`。
+  `git log <PR の base>..HEAD --grep='^review-round:' --oneline | wc -l`（base は PR の
+  `baseRefName`）。
   この値が **2 の状態で行う再レビューが最終周（3 周目）**。最終周で未解消 / 悪化 / 新しい
   blocker が出ても**手順 4 に戻らず**（直さず・コミットせず）、下の報告に進む。値が 3 以上
   なら（同じ PR で再実行した場合など）再レビュー自体をせず、その旨を伝えて下の報告に進む。

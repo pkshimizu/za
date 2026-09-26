@@ -28,8 +28,13 @@ PR は外部に作成されるので、**作成前に内容をユーザーに提
 
 ### 1. ブランチと作成先を確認する
 
-- 現在のブランチを確認する（`git branch --show-current`）。base となるデフォルトブランチ
-  （`main` 等）を確認する（`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）。
+- 現在のブランチを確認する（`git branch --show-current`）。
+- **base ブランチを決める。** `docs/PR.md` の「base ブランチ」節の最初のバッククォートで囲んだ
+  名前を base にする。節が無い・`docs/PR.md` が無ければ、デフォルトブランチ
+  （`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）を base にする。
+  `docs/MERGE.md` にも base の指定があり、`docs/PR.md` と食い違う場合は、どちらを正とするか
+  推測せず**止まって**両方の値を示す（`za:auto` はこの 2 つが一致していることを前提に
+  マージするため）。base が `origin` に存在しなければ、その旨を伝えて止まる。
 - 現在ブランチが base そのものの場合は PR を作れない。その旨を伝え、作業ブランチに
   切り替えるか作るよう促す。
 - リモートや `gh` が使えず取得できない場合も、その旨を伝えて確認する（勝手に別リポジトリへ
@@ -87,7 +92,8 @@ gh pr create --base <base> --title "<タイトル>" --body-file <本文ファイ
 
 ### 7. 完了報告
 
-作成した PR の URL を報告する。タイトル・base←head・紐づけた issue も併せて伝える。
+作成した PR の URL を報告する。タイトル・base←head（base をどこから決めたか）・紐づけた issue も
+併せて伝える。
 
 ---
 
