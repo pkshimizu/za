@@ -1,0 +1,7 @@
+interface:
+  display_name: "za:auto"
+  short_description: "ボードの Ready から 1 件ずつ実装・レビュー・マージまで回す"
+  default_prompt: "docs/ORCHESTRATION.md の設定でボードの Ready から次の 1 件を選び、za:goal とゲート判定を経てマージまで進めてください。"
+
+policy:
+  allow_implicit_invocation: false
