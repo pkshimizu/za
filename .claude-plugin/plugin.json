@@ -21,6 +21,7 @@
     "./skills/cross-goal",
     "./skills/merge",
     "./skills/release",
+    "./skills/auto",
     "./skills/hunk-resolve"
   ]
 }
