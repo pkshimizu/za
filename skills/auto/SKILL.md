@@ -45,9 +45,7 @@ description: >-
 `git push --force`、`gh pr merge --admin` など、履歴や保護を迂回する操作は行わない。
 機械の判断をボードに書くときは、必ず issue コメントに理由を残す（人が後から追えるように）。
 
-マージ先は `docs/MERGE.md` の base に従う。現時点では `za:fix-issue` / `za:pr` がデフォルト
-ブランチを base に取るので、実質デフォルトブランチ向けになる。リリースブランチ（`develop` 等）
-を base にする運用は、`za:pr` が base を `docs/PR.md` から読むようになってから（別 issue）。
+マージ先は `docs/MERGE.md` の base に従う（`za:pr` が作る PR の base と同じデフォルトブランチ）。
 
 ## 前提
 
