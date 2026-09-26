@@ -82,8 +82,10 @@ PR の差分が次に触れていたら、`za:auto` はマージせず `In revie
 |---|---|---|
 | protected_paths | `Makefile`, `.swiftlint.yml`, `scripts/ci/**` | CI が依存する検証手段。ここを変える PR は人が見る（テストを通すために検証を弱める経路を塞ぐ） |
 | manual_check_paths | `Sources/App/UI/**`（任意） | ここに触れる PR は実機確認が要るとみなし、`za:auto` が `needs_manual_check` を付けて止める |
+| test_paths | `Tests/**`（任意） | ここに当たるファイルを削除する PR は人が見る |
 
-テストファイルの削除は、パスにかかわらず常に人に回す。
+PR 本文の確認事項（チェックボックス）はゲートに使われない。実機確認の要否はラベルと
+`manual_check_paths` で決める。
 
 ## ゲート
 
@@ -95,7 +97,8 @@ PR の差分が次に触れていたら、`za:auto` はマージせず `In revie
 ## 人間が見る場所
 
 - `needs_decision` の issue: ボードの `Backlog` をラベルで絞る
-- `needs_manual_check` の PR、人に回された PR: ボードの `In review`
+- `needs_manual_check` の PR、人に回された PR: ボードの `In review`。出口は `/za:merge` で
+  マージするか、原因を解消して（ラベルを外す等）`Ready` に戻す（次の起動で再判定される）
 - `za:auto` が残したコメント（`za:auto:` で始まる）: 着手・収束・保留・失敗の記録
 
 ## 自動運転を止めたいとき

@@ -38,6 +38,10 @@ description: >-
 
 ゲートを 1 つでも通らない PR、人の判断が要る状況（想定外の確認、判定できない状態）は
 **マージせず `In review` で止めて人に回す**。安全側に倒すのが既定で、迷ったらマージしない。
+保留した PR の出口は 2 つ: 人が **`/za:merge`** でマージする（issue が閉じれば手順 1 で `Done` に
+移る）か、原因を解消して（ラベルを外す等）item を **`Ready` に戻す**（次の起動でゲートから
+再判定する）。ただし `hold reason=unconverged`（収束マーカーが無い・SHA が違う）は `za:auto` では
+解けないので、出口は `/za:merge` だけ。
 `git push --force`、`gh pr merge --admin` など、履歴や保護を迂回する操作は行わない。
 機械の判断をボードに書くときは、必ず issue コメントに理由を残す（人が後から追えるように）。
 
@@ -77,7 +81,7 @@ description: >-
    - ラベル `needs_decision` / `needs_manual_check` が `gh label list` に**実在する**こと
    - `.github/workflows/*.yml` または `*.yaml` がデフォルトブランチに 1 つ以上あること
    - 上限（`max_per_run` / `max_failures` / `ci_timeout_minutes` / `max_leftover_issues`）、
-     `protected_paths`、`require_milestone`、任意の `manual_check_paths`
+     `protected_paths`、`require_milestone`、任意の `manual_check_paths` / `test_paths`
    - `docs/MERGE.md` の base・マージ方法・head の扱い・マージの前提
 3. ボード全件を取得する: `gh project item-list <project> --owner <owner> --format json --limit 500`。
    返却が 500 件に達したら（取りこぼしの可能性）止まる。各 item は `id` / `status` / `priority` /
@@ -114,9 +118,10 @@ description: >-
   失敗時に `Backlog` へ落ちているはずなので、人がラベルだけ外した等の保険）
 - **依存**: 本文の `## 依存` 節から `^\s*- blocked by:\s*(#\d+|[\w.-]+/[\w.-]+#\d+)` に一致する行を
   読む（取り消し線 `~~` の行は除く）。参照先を `gh issue view --json state,stateReason` で引き:
-  - OPEN が 1 つでもある → **飛ばして**次の候補へ。Status は動かさず、issue に 1 回だけ
-    「依存 #N が未解決」とコメントする（人が承知で `Ready` に置いた可能性があるので、
-    毎 tick `Backlog` へ差し戻す綱引きはしない）
+  - OPEN が 1 つでもある → **飛ばして**次の候補へ。Status は動かさず、issue に
+    `<!-- za:auto:skip reason=blocked -->` を含むコメントで「依存 #N が未解決」と残す（同じ理由の
+    連投はしない。人が承知で `Ready` に置いた可能性があるので、毎 tick `Backlog` へ差し戻す
+    綱引きはしない）
   - `stateReason` が `NOT_PLANNED` で閉じたものがある → 却下された前提の上に実装しない。
     `needs_decision` を付けて `Backlog` に落とし、コメントを残して次の候補へ
   - 他リポジトリの参照が取得できない → 未解決とみなし飛ばす
@@ -145,7 +150,7 @@ description: >-
 
 | 観測 | 判定 |
 |---|---|
-| PR が無い | **失敗**（`kind=issue`）として記録。Status を `Ready` に戻す。手順 4-a で片付けて次の候補へ |
+| PR が無い | **失敗**として記録（push 拒否・`gh` の失敗が原因なら `kind=env`、それ以外は `kind=issue`）。Status を `Ready` に戻す。手順 4-a で片付けて次の候補へ |
 | PR があるが未収束 | `In review` にして**ゲート不合格**（`kind=issue`）。手順 4-a で片付けて次の候補へ |
 | PR があり収束 | `In review` にして手順 5 へ |
 
@@ -171,14 +176,16 @@ PR は `In review` にある。次をすべて満たすかを見る。判定の�
 （`kind=issue`）として issue コメントに残し、手順 4-a で片付けて次の候補へ。
 
 1. **`baseRefName` が `docs/MERGE.md` の base と一致**。違えば保留（人に回す）
-2. **`needs_manual_check` が issue に付いていない。** 付いていれば保留（**成功扱い**。失敗には
-   数えない。人が実機で確かめてからマージする）
+2. **`needs_manual_check` が issue に付いていない。** 付いていれば保留（`hold reason=manual_check`。
+   **成功扱い**で失敗には数えない。人が実機で確かめてからマージする）
 3. **PR の差分が人に回すパスに触れていない**（`gh pr diff <番号> --name-only`）:
    `docs/ORCHESTRATION.md` / `docs/MERGE.md` / `.github/workflows/**` / 設定の `protected_paths`。
-   触れていれば保留（ゲート自体と、ゲートが依存する検証手段の変更は人が見る）。
-   **テストファイルの削除**（`git diff --diff-filter=D --name-only origin/<base>...origin/<head>` に
-   テストが含まれる）も保留。設定の `manual_check_paths` に触れていれば、`needs_manual_check` を
-   **付けて**保留
+   触れていれば保留（`hold reason=protected_path`。ゲート自体と、ゲートが依存する検証手段の変更は
+   人が見る）。設定に `test_paths` があれば、そこに当たるファイルの削除
+   （`git diff --diff-filter=D --name-only origin/<base>...origin/<head>`）も同じ扱い。
+   設定の `manual_check_paths` に触れていれば `needs_manual_check` を**付けて**保留する。ただし
+   **その issue に `hold reason=manual_check` のマーカーが既にあり、いまラベルが外れているなら、
+   人が確認を終えて外したとみなして付け直さず、このゲートは通す**（人の解除を上書きしない）
 4. **レビューが収束している**: PR コメントに `za:auto:converged` マーカーがあり、その `sha` が
    現在の `headRefOid` と一致する。マーカーが無い（人が作った PR、`za:goal` が途中で落ちた PR）・
    SHA が違う（収束後に push された）→ **判定できない**ので保留。`za:review` を通していない
@@ -195,10 +202,10 @@ PR は `In review` にある。次をすべて満たすかを見る。判定の�
      マーカーを付けずに**この起動を止める**（ワークフローのトリガーを疑う。issue の責任ではない）
 6. **コンフリクトなし**: `mergeable` が `UNKNOWN` の間は数回引き直す。`CONFLICTING` → 不合格
    （`kind=issue`）
-7. **`docs/MERGE.md` の「マージの前提」**のうち機械で判定できる項目。PR 本文の確認事項は
-   `za:pr` が書いた自己申告なので、**「実機で触った」「手動で確認した」系の項目は未チェックでも
-   チェック済みでも信用せず**、その項目があれば `needs_manual_check` を付けて保留にする。
-   機械で判定できない前提が書かれていれば保留
+7. **`docs/MERGE.md` の「マージの前提」**のうち、ゲート 1〜6 で判定していない機械判定可能な
+   項目（無ければ空）。機械で判定できない前提が書かれていれば保留。**PR 本文の確認事項は
+   ゲートに使わない**（`za:pr` が書いた自己申告なので、合格の根拠にも保留の根拠にもしない。
+   実機確認の要否はゲート 2 のラベルとゲート 3 の `manual_check_paths` だけで決める）
 
 ### 6. マージする
 
@@ -266,8 +273,8 @@ PR は `In review` にある。次をすべて満たすかを見る。判定の�
 
 ## 失敗と保留の記録
 
-issue に、次のマーカーを含むコメントを残す。同じ issue に同じ理由で連続して残さない
-（最新の `za:auto` コメントと理由が同じならスキップ）。
+issue に、次のマーカーを含むコメントを残す。`za:auto:` で始まるコメントはすべて、同じ issue に
+同じ理由で連続して残さない（最新の `za:auto` コメントと理由が同じならスキップ）。
 
 ```
 <!-- za:auto:failure kind=issue|env pr=<番号 or none> -->
@@ -297,6 +304,9 @@ za:auto: <日時> <どの手順で・何が起きたか・次に人が見るべ�
 - 同じ issue の失敗が `max_failures` に達した
 - 環境起因（`kind=env`）の失敗、CI が走っていない、保護ルールでマージが拒否された
 - 処理件数が `max_per_run` に達した
+
+起動を止めるときも、手順 3 以降にいるなら先に 4-a を通してデフォルトブランチのきれいな状態に
+戻す（戻せなかった場合だけ、手順 0 の前提不成立として次の起動が止まる）。
 
 継続運転している場合、この起動が止まっても次の起動は走る。上の理由が解消しない限り次も同じ
 理由で止まるので、報告には「継続運転を止めるか、〜を解消してから」を添える。
