@@ -35,8 +35,11 @@
 
 | 役割 | ラベル名 | 意味 |
 |---|---|---|
-| needs_decision | `{要判断}` | 人間が決めるまで着手できない。`za:auto` は拾わない |
+| needs_decision | `{要判断}` | 人間が決めるまで着手できない。`za:auto` は拾わない・`Ready` に上げない |
+| needs_human | `{要人手}`（任意。複数はカンマ区切り） | 人の作業そのものが成果物で、機械が実装するものが無い。`za:auto` は拾わない・`Ready` に上げない（扱いは `needs_decision` と同じ。人向けの意味だけが違う） |
 | needs_manual_check | `{要実機確認}` | 実装は自動でできるが、マージ前に人間が実機で確かめる。`In review` で止める |
+
+`needs_human` を書かないプロジェクトでは `needs_decision` だけが「拾わない」ラベルになる。
 
 ## 依存の書式
 
@@ -96,7 +99,7 @@ PR 本文の確認事項（チェックボックス）はゲートに使われ�
 
 ## 人間が見る場所
 
-- `needs_decision` の issue: ボードの `Backlog` をラベルで絞る
+- `needs_decision` / `needs_human` の issue: ボードの `Backlog` をラベルで絞る
 - `needs_manual_check` の PR、人に回された PR: ボードの `In review`。出口は `/za:merge` で
   マージするか、原因を解消して（ラベルを外す等）`Ready` に戻す（次の起動で再判定される）。
   ただし収束マーカーが無い PR と、ゲート自体（`docs/ORCHESTRATION.md` 等）を変える PR は

@@ -19,8 +19,13 @@ description: >-
 
 プロジェクトボードの `Ready` から次の 1 件を選び、`za:goal`（実装 → PR → レビュー収束）と
 ゲート判定を経て、マージ・ボード更新まで進める。issue 番号ひとつを渡す `za:goal` の一段上で、
-「次に何をやるか」自体を決めて回す。人間が関わるのは**決めること**（`needs_decision`）と
-**実機で確かめること**（`needs_manual_check`）だけにし、それ以外はボードの整理まで機械が回す。
+「次に何をやるか」自体を決めて回す。人間が関わるのは**決めること**（`needs_decision`）、
+**人の作業そのものが成果物のもの**（`needs_human`。任意）、**実機で確かめること**
+（`needs_manual_check`）だけにし、それ以外はボードの整理まで機械が回す。
+
+`needs_decision` と `needs_human` は「`za:auto` が拾わない・上げない」点で同じ扱い。違いは
+人向けの意味だけ（決めれば機械に渡せる / 人がやるしかない）。以下「拾わないラベル」と書いたら
+この 2 つ（`needs_human` は設定にあれば）を指す。
 
 このスキルは 1 回の起動（1 tick）で設定の上限件数まで処理して終わる。継続運転は、セッションを
 分けて起動する（cron や `/schedule` から `claude -p "/za:auto"`）。`/loop` は同じセッションに
@@ -76,7 +81,8 @@ description: >-
    - Status の **field id** と 5 つの **option id**（`gh project field-list <project> --owner <owner>
      --format json`。設定の値名と一致する option が 5 つとも見つかること）。`priority_field` が
      あればその field id も
-   - ラベル `needs_decision` / `needs_manual_check` が `gh label list` に**実在する**こと
+   - ラベル `needs_decision` / `needs_manual_check`、および設定にあれば `needs_human`（複数可）が
+     `gh label list` に**実在する**こと
    - `.github/workflows/*.yml` または `*.yaml` がデフォルトブランチに 1 つ以上あること
    - 上限（`max_per_run` / `max_failures` / `ci_timeout_minutes` / `max_leftover_issues`）、
      `protected_paths`、`require_milestone`、任意の `manual_check_paths` / `test_paths`
@@ -106,8 +112,9 @@ description: >-
 
 ### 2. 次の 1 件を選ぶ
 
-候補: `Ready` かつ issue が OPEN（`gh issue view --json state`）かつ `needs_decision` が付いて
-いない、かつこのリポジトリの issue。並びは **Priority 昇順（未設定は末尾）→ item-list の返却順
+候補: `Ready` かつ issue が OPEN（`gh issue view --json state`）かつ拾わないラベルが付いて
+いない、かつこのリポジトリの issue。拾わないラベルが付いたまま `Ready` にある issue は
+候補から外すだけで Status は動かさない（人が置いた可能性がある。報告に載せる）。並びは **Priority 昇順（未設定は末尾）→ item-list の返却順
 （ボードの手動順）→ issue 番号昇順**。マイルストーンは選択の条件にしない（順序は依存で決まる）。
 
 先頭候補から順に、次を確認して通ったものを採用する:
@@ -126,7 +133,7 @@ description: >-
   - `blocked by:` の形でない依存らしき記述（「#54 のマージ後」等）→ 依存とは扱わないが、
     **警告として報告に載せる**
 - 上記を通った先頭が採用。**候補が 0 件なら止まる**（理由: `Ready` に対象なし。残りが
-  `needs_decision` / `needs_manual_check` だけならその旨も書く）。
+  拾わないラベル / `needs_manual_check` だけならその旨も書く）。
 
 ### 3. `In progress` にして `za:goal` を実行する
 
@@ -234,7 +241,7 @@ PR は `In review` にある。次をすべて満たすかを見る。判定の�
    コメントする:
    - 依存を**すべて**手順 2 の規則で再確認し、全部 CLOSED（`NOT_PLANNED` を除く）
    - `## 依存` 節に `blocked by:` 以外の記述（未決定を示すもの）が無い
-   - `needs_decision` が付いていない
+   - 拾わないラベル（`needs_decision` / `needs_human`）が付いていない
    - `require_milestone` が `yes` なら、マイルストーンが付いている
 4. 昇格した issue を報告に載せる（リリース issue が閉じたときは一斉に上がる）。
 
@@ -301,7 +308,7 @@ za:auto: <日時> <どの手順で・何が起きたか・次に人が見るべ�
 - `docs/ORCHESTRATION.md` / `docs/MERGE.md` が無い、必須項目が欠ける、ラベル・Status・CI が
   実在しない（手順 0）
 - 作業ツリーに未コミット変更がある、または作業ブランチに残っている（手順 0・4-a）
-- `Ready` に対象が 1 件も無い。残りが `needs_decision` / `needs_manual_check` だけの場合も含む
+- `Ready` に対象が 1 件も無い。残りが拾わないラベル / `needs_manual_check` だけの場合も含む
 - 同じ issue の失敗が `max_failures` に達した
 - 環境起因（`kind=env`）の失敗、CI が走っていない、保護ルールでマージが拒否された
 - 処理件数が `max_per_run` に達した
