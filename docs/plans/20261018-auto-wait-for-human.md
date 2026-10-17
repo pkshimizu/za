@@ -3,8 +3,7 @@
 作成: 2026-10-18（shoki での運用から）
 
 > **手順の正は `skills/auto/SKILL.md`。** 設計を攻撃させたレビュー（2026-10-18）で、待ちの種類を
-> `decision` / `human_task` / `gate` / `release` にまとめ、機械のゲートを先に通す、書き手のアカウントで
-> 返事を絞る、ロックを取る、`needs_human` では `za:goal` を呼ばず先に人に頼む、などに直した。
+> `decision` / `human_task` / `gate` / `release` にまとめ、機械のゲートを先に通す、ロックを取る、`needs_human` では `za:goal` を呼ばず先に人に頼む、などに直した。
 > 下の本文はその前の版で、細部は SKILL.md と違う。
 
 ## 目的

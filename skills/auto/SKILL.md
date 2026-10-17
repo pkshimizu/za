@@ -78,18 +78,15 @@ issue のコメントに書いて待つ**（手順 2-a「待ちを書く」）�
 
 ## コメントの決まり
 
-`za:auto` と人は**同じ `gh` のアカウント**で issue・PR にコメントを書く。人のコメントと機械の
-コメントを取り違えないよう、次を守る。
+`za:auto` と人は同じ `gh` のアカウントで issue・PR にコメントを書くことがあるので、書き手では
+区別できない。人のコメントと機械のコメントを、本文の先頭のマーカーで区別する。
 
 - **`za:auto` が書くコメントは、すべて本文の先頭（1 行目）に `<!-- za:auto:<種類> ... -->` を置く。**
   理由を残すだけのコメント（「Ready に戻した」「依存 #N が閉じたので Ready へ」、`gh issue close
   --comment` など）も同じ。マーカーの種類は、下の表に無いものは `<!-- za:auto:note -->` とする。
-- **人のコメント** = 書き手が `za:auto` を動かしているアカウント（手順 0 で `gh api user -q .login`
-  から取る）で、本文の先頭が `<!-- za:auto:` で始まらないもの。本文の途中にマーカーが引用されて
-  いても人のコメントとして扱う。
-- **マーカー（待ち・解決・ゲートの通過など）も、書き手がそのアカウントのものだけを数える。**
-  ほかのアカウントのコメントは、返事にもマーカーにも数えない（公開リポジトリで、部外者の
-  コメントがゲートを通さないように）。そうしたコメントがあれば報告に載せる。
+- **人のコメント** = 本文の先頭が `<!-- za:auto:` で始まらないコメント。書き手は問わない。本文の
+  途中にマーカーが引用されていても人のコメントとして扱う。
+- **マーカー** = 本文の先頭が `<!-- za:auto:` で始まるコメントの、その 1 行目。
 
 | マーカー | どこに | 意味 |
 |---|---|---|
@@ -121,8 +118,7 @@ issue のコメントに書いて待つ**（手順 2-a「待ちを書く」）�
    （`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）であること。
    作業ブランチに残っている場合は、前回の途中終了なので**止まる**（手で戻し、不要な作業ブランチを
    消してから再実行するよう案内する）。`git fetch origin` → `git pull --ff-only`。
-3. `gh api user -q .login` で、`za:auto` を動かしているアカウントを取る（コメントの決まり）。
-4. `git show origin/<default>:docs/ORCHESTRATION.md` と `docs/MERGE.md` を読み、次をすべて解決する:
+3. `git show origin/<default>:docs/ORCHESTRATION.md` と `docs/MERGE.md` を読み、次をすべて解決する:
    - ボード: `gh project view <project> --owner <owner> --format json -q .id` で **project id**（`PVT_…`）
    - Status の **field id** と 5 つの **option id**（`gh project field-list <project> --owner <owner>
      --format json`。設定の値名と一致する option が 5 つとも見つかること）。`priority_field` が
@@ -133,11 +129,11 @@ issue のコメントに書いて待つ**（手順 2-a「待ちを書く」）�
    - 上限（`max_failures` / `ci_timeout_minutes` / `max_leftover_issues`）、
      `protected_paths`、`require_milestone`、任意の `manual_check_paths` / `test_paths`
    - `docs/MERGE.md` の base・マージ方法・head の扱い・マージの前提
-5. ボード全件を取得する: `gh project item-list <project> --owner <owner> --format json --limit 500`。
+4. ボード全件を取得する: `gh project item-list <project> --owner <owner> --format json --limit 500`。
    返却が 500 件に達したら（取りこぼしの可能性）止まる。各 item は `id` / `status` / `priority` /
    `labels` / `content.number` / `content.body` / `content.repository` を持つ（**`content` に issue の
    open/closed は無い**）。
-6. open PR の一覧を取る: `gh pr list --state open --limit 200 --json number,url,headRefName,headRefOid,baseRefName`。
+5. open PR の一覧を取る: `gh pr list --state open --limit 200 --json number,url,headRefName,headRefOid,baseRefName`。
    issue に紐づく PR は、`headRefName` を `^feature/<番号>-` で照合して決める（`gh pr list --search
    "head:…"` は使わない。完全一致かどうかが不確かで、`feature/1-` が `feature/12-` に当たる）。
    必要なら `gh issue view <番号> --json closedByPullRequestsReferences` も併用する。
@@ -211,10 +207,10 @@ za:auto: <日時> 人の対応を待っています（<種類の日本語名>）
 
 ```sh
 gh api --paginate repos/<owner>/<repo>/issues/<番号>/comments \
-  --jq '.[] | {id, user: .user.login, created_at, updated_at, body}'
+  --jq '.[] | {id, created_at, updated_at, body}'
 ```
 
-- `gh issue view --comments` は書き手の login と更新日時を出さないので使わない。
+- `gh issue view --comments` は更新日時を出さないので使わない。
 - **返事** = 未解決の待ちのコメントの作成日時より後に**作られた、または書き直された**
   （`updated_at`）**人のコメント**（コメントの決まり）。ただし、過去の `za:auto:resolved` の
   `replies=` に同じ `id@updated_at` で記録したものは除く（処理済みの返事を、待ち直したほうの返事と
@@ -343,7 +339,7 @@ CI の失敗（ゲート 5）とコンフリクト（ゲート 6）を直すと�
 
 `za:goal` の報告に頼らず、状態で決める。`git fetch origin` してから:
 
-- 手順 0-6 の方法で **PR の有無**を見る
+- 手順 0-5 の方法で **PR の有無**を見る
 - PR があれば **収束したか**: `za:review` のサマリー（指摘の一覧に状態「未解消」の行が無く、
   「レビュー範囲」に打ち切りの記載が無い）で判定する。収束していれば、PR に
   `za:auto:converged sha=<headRefOid>` を残す。`headRefOid` は `gh pr view <番号> --json headRefOid` で取る
@@ -486,7 +482,7 @@ git branch -D <作業ブランチ>      # 失敗した試行の変更は捨て�
 ### 9. 繰り返すか、終える
 
 この周で**状態が前に進んだ**（待ちを解決した、着手した、マージした、昇格した、Status を直した）
-なら、**手順 0-5・0-6 を引き直して手順 1 に戻る**。依存が解けて新しく `Ready` が増えている、
+なら、**手順 0-4・0-5 を引き直して手順 1 に戻る**。依存が解けて新しく `Ready` が増えている、
 ことがあるため。この起動で扱い済みの item は扱わないので、同じ item で回り続けることはない。
 
 何も進まなければ、この起動を終えて報告する:
@@ -502,8 +498,8 @@ git branch -D <作業ブランチ>      # 失敗した試行の変更は捨て�
 - `za:goal` の成果（ブランチ・PR URL・レビュー周回数）と判断ログ、または解決した待ちと進めたこと
 - ゲートの結果（各項目の合否）とマージの有無
 - 書いた待ち（種類と要約）、昇格した issue、作った issue、手順 1 で直した item
-- 警告（依存らしき記述、読めなかった返事、解決のあとに来た人のコメント、ほかのアカウントの
-  コメント、未解決の待ちが無いのに `waiting` が付いた item）
+- 警告（依存らしき記述、読めなかった返事、解決のあとに来た人のコメント、
+  未解決の待ちが無いのに `waiting` が付いた item）
 
 **何も進めなかった起動は、ボードにも issue にも何も書かない**（定期起動で同じコメントが積もらないように）。
 起動を終えるときはロック（手順 0-1）を消す。
