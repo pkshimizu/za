@@ -1,7 +1,7 @@
 interface:
   display_name: "za:auto"
-  short_description: "ボードの Ready から 1 件ずつ実装・レビュー・マージまで回す"
-  default_prompt: "docs/ORCHESTRATION.md の設定でボードの Ready から次の 1 件を選び、za:goal とゲート判定を経てマージまで進めてください。"
+  short_description: "ボードのタスクを、人の返事を待ちながら最後まで実装・レビュー・マージする"
+  default_prompt: "docs/ORCHESTRATION.md の設定で、ボードのタスクを進められるものが無くなるまで消化してください。人の対応が要るものは issue のコメントで頼んで待ち、返事があれば続きを進めてください。"
 
 policy:
   allow_implicit_invocation: false
