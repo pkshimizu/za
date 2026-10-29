@@ -285,7 +285,8 @@ gh api --paginate repos/<owner>/<repo>/issues/<番号>/comments \
 `gate` に「違う」と返ってきたら、`za:auto` が直す。**回数の上限は設けない。** 人が「違う」と返す
 かぎり、直して待ち直す。
 
-1. PR のブランチを取り出す（`gh pr checkout <PR>`）。
+1. PR のブランチを worktree に取り出す（`za:review` の手順 1 と同じ。`za:goal` が作った worktree が
+   残っていればそれを使う）。直しとコミット・push はその中で行う。
 2. 返事を指摘として直す。`za:review` 手順 4 の原則に従う（指摘された箇所だけを最小の差分で、
    検証を添える、機械で取れるものは掃く）。コミットの本文に `rework: wait-<待ちの id>` の行を入れる
    （`review-round:` は付けない。`za:review` の周の数え方と混ぜない）。
@@ -360,10 +361,12 @@ CI の失敗（ゲート 5）とコンフリクト（ゲート 6）を直すと�
 #### 5-a. 片付け
 
 次の item へ進む前・待ちに入った後・起動を止める前に、必ずデフォルトブランチのきれいな状態に戻す。
-`za:goal` は作業ブランチに居るまま終わり、途中で落ちると未コミット変更が残る。
+`za:goal` は作業ブランチを worktree に作り（`za:fix-issue` の手順 3）、途中で落ちるとそこに未コミット
+変更が残る。
 
 ```sh
 git reset --hard && git switch <default> && git pull --ff-only
+git worktree remove --force <作業ブランチの worktree>   # git worktree list で探す。あれば
 git branch -D <作業ブランチ>      # 失敗した試行の変更は捨ててよい（PR があればリモートに残る）
 ```
 
@@ -440,7 +443,8 @@ git branch -D <作業ブランチ>      # 失敗した試行の変更は捨て�
 - 保護ルールで拒否された → issue の責任ではないので、マーカーを付けずに**この起動を止める**
   （設定か権限の問題）。それ以外の失敗は `kind=env`
 - マージ後、`git switch <default>` → `git pull --ff-only`。PR が MERGED であることを
-  `gh pr view --json state` で確認してから、ローカルの作業ブランチを `git branch -D` で消す
+  `gh pr view --json state` で確認してから、作業ブランチの worktree を `git worktree remove` で消し
+  （未コミットの変更があれば 5-a と同じく捨ててよい）、ローカルの作業ブランチを `git branch -D` で消す
 
 ### 8. `Done` にして、依存が解けた issue を昇格する
 

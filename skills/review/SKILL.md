@@ -39,8 +39,24 @@ GitHub プルリクエスト（PR）を、プロジェクトが定めたレビ�
 
 - 引数が無い場合: `gh pr list` を提示し、「どの PR をレビューしますか？」と確認する。
 - `gh pr view <番号>`（必要なら `--comments`）と `gh pr diff <番号>` で内容と差分を把握する。
-- 修正を加えるため、`gh pr checkout <番号>` で PR のブランチをローカルに取り出す。
-  作業ツリーに未コミットの変更があれば、混ざらないよう先に確認する。
+- 修正を加えるため、PR のブランチを **worktree に取り出し、以降の作業（修正・コミット・push）は
+  その中で行う**。メインのチェックアウトのブランチは切り替えない。同じリポジトリで別の
+  セッションが動いていることがあり、切り替えるとその作業を壊すため。
+  - `git worktree list` に PR の head ブランチの worktree があれば、それを使う（`za:fix-issue` が
+    作ったもの）。未コミットの変更があれば、混ざらないよう先に確認する。
+  - 無ければ作る。`gh pr checkout` はフォークからの PR や追跡の設定も扱えるので、空の worktree の
+    中で使う:
+
+    ```sh
+    git fetch origin
+    git_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
+    main_dir="$(dirname "$git_dir")"
+    # `za:fix-issue` の手順 3 と同じく、worktree をメインのチェックアウトの未追跡に見せない
+    grep -qxF '/.claude/worktrees/' "$git_dir/info/exclude" 2>/dev/null \
+      || echo '/.claude/worktrees/' >> "$git_dir/info/exclude"
+    git worktree add --detach "$main_dir/.claude/worktrees/<head の / を - にした名前>" origin/<base>
+    cd "$main_dir/.claude/worktrees/<head の / を - にした名前>" && gh pr checkout <番号>
+    ```
 - PR が見つからない／クローズ済み、`gh` が使えない場合は、推測で進めず状況を伝えて確認する。
 
 ### 2. レビュー観点を読み込む

@@ -28,6 +28,9 @@ PR は外部に作成されるので、**作成前に内容をユーザーに提
 
 ### 1. ブランチと作成先を確認する
 
+- 作業ブランチの worktree（`za:fix-issue` が作ったもの。`git worktree list` で探す）があれば、
+  その中で以降のコマンドを実行する。メインのチェックアウトのブランチは切り替えない
+  （別のセッションが使っていることがある）。
 - 現在のブランチを確認する（`git branch --show-current`）。base となるデフォルトブランチ
   （`main` 等）を確認する（`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）。
 - 現在ブランチが base そのものの場合は PR を作れない。その旨を伝え、作業ブランチに

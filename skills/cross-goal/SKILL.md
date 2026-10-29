@@ -54,7 +54,9 @@ command -v claude && claude --version && claude auth status  # Codex で実行�
 
 ### 1. 実装する（`za:fix-issue`）
 
-`za:fix-issue` を呼び出し、issue の実装とコミットまで行う。
+`za:fix-issue` を呼び出し、issue の実装とコミットまで行う。`za:fix-issue` は作業ブランチを
+専用の worktree に作るので、手順 2・3 もその worktree の中で続けて実行する（メインの
+チェックアウトのブランチは切り替えない）。
 
 ### 2. PR を作成する（`za:pr`）
 
@@ -87,8 +89,8 @@ command -v claude && claude --version && claude auth status  # Codex で実行�
 ただし次は**判断ではなく前提の不成立**なので、自動で進めず停止して報告する:
 
 - 指定された issue が見つからない・クローズ済み・引数が無い
-- 作業ツリーに関係のない未コミット変更がある（混入を防ぐため）
-- 現在のブランチがデフォルトブランチでなく、分岐元の判断がつかない
+- worktree を作れない（同じ名前のブランチや worktree がすでにある など。`za:fix-issue` の手順 3）
+- 分岐元の判断がつかない（`za:fix-issue` の手順 3）
 - push・PR 作成・CI などが失敗し、自動リトライで解消しない
 - **レビューが上限 3 ラウンドで収束しなかった**（`za:cross-review` が残指摘を報告してユーザーに
   確認する場面。直すか issue 化するかは自動で決めず、残指摘の一覧（検出元つき）を添えて停止する。
@@ -114,7 +116,7 @@ command -v claude && claude --version && claude auth status  # Codex で実行�
 
 最後に次をまとめて報告する:
 
-- **成果物**: ブランチ名・コミット一覧・PR の URL とタイトル
+- **成果物**: ブランチ名と worktree の場所・コミット一覧・PR の URL とタイトル
 - **クロスレビュー結果**: `za:cross-review` の完了報告（レビュー体制・対応した指摘 / 対応
   しなかった指摘（検出元つき）・ラウンド数と収束の有無・モデル別の傾向）をそのまま含める
 - **自動採用した判断**: 上記の判断ログ
