@@ -47,7 +47,8 @@ GitHub プルリクエスト（PR）を **Claude と Codex の 2 モデル**で�
 ### 1. 対象 PR を特定してチェックアウトする
 
 `za:review` の手順 1 と同じ。引数の PR 番号/URL（例: `/za:cross-review 42`）から特定し、
-`gh pr view` / `gh pr diff` で内容と差分を把握し、`gh pr checkout <番号>` で取り出す。
+`gh pr view` / `gh pr diff` で内容と差分を把握し、`za:review` の手順 1 と同じく PR のブランチを
+worktree に取り出して、以降の作業はその中で行う（メインのチェックアウトのブランチは切り替えない）。
 
 - 引数が無い場合は `gh pr list` を提示して確認する。
 - PR が見つからない／クローズ済み、`gh` が使えない場合は、推測で進めず状況を伝えて確認する。
