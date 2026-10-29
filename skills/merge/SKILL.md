@@ -43,8 +43,8 @@ description: >-
 ### 2. マージ可能な状態かを確認する
 
 レビュー完了後の取り込みなので、マージしてよい状態かを確認する。
-`gh pr view <番号> --json state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup`
-などで次を見る:
+`gh pr view <番号> --json state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,headRefOid`
+などで次を見る（`headRefOid` は、ここで確かめた head の SHA として手順 4・5 で使う）:
 
 - **レビュー承認**: `reviewDecision` が承認相当か。未承認・変更要求が残っていれば、その旨を
   伝えて、マージしてよいか確認する（勝手に押し切らない）。
@@ -135,8 +135,10 @@ description: >-
   変更の要点を示す。PR が `docs/MERGE.md` を変えていれば、その差分も示す
 - マージ方法（squash / merge / rebase）と head ブランチ削除の有無
 
-「この内容でマージしてよいか」を確認する。承認したときの head の SHA
-（`gh pr view <番号> --json headRefOid -q .headRefOid`）を控える（手順 5 で使う）。
+- head の SHA（手順 2 で取った `headRefOid`）
+
+「この内容でマージしてよいか」を確認する。承認されたら、提示した head の SHA を控える（手順 5 で
+使う。承認の後に取り直さない。提示から承認までの間に push されたコミットを紛れ込ませないため）。
 
 ユーザーが事前に「確認不要、そのままマージ」と明示している場合は、省いてよいのは**マージ
 そのものの確認だけ**。未解決のレビューコメント、判断がつかない対応、コマンドの実行・外部への
@@ -148,14 +150,16 @@ description: >-
 
 - PR の head ブランチへのコミットが要る対応は、head の worktree で行い、メインのチェックアウトの
   ブランチは切り替えない。worktree は `git worktree list` で探し、無ければ `za:review` の手順 1 と
-  同じやり方で取り出す。コミットの前に `git fetch origin` → `git merge --ff-only origin/<head>` で
-  最新にする。fast-forward できない、未コミットの変更がある、push できない（フォークからの PR、
-  保護されたブランチなど）場合は止まって確認する。force push はしない。
+  同じやり方で取り出す。コミットの前に `git fetch origin` し、`git rev-parse origin/<head>` が控えた
+  SHA と一致することを確かめてから `git merge --ff-only origin/<head>` で最新にし、`git rev-parse HEAD`
+  も控えた SHA と一致することを確かめる（承認後に push されたコミットや、未 push のローカルの
+  コミットを混ぜないため）。一致しない、fast-forward できない、未コミットの変更がある、push できない
+  （フォークからの PR、保護されたブランチなど）場合は止まって確認する。force push はしない。
 - 対応が終わったら、結果（コミット・実行したコマンドの出力の要点など）を確かめる。PR へ
   コミットを push した場合は、手順 2 の項目（承認・CI・コンフリクト・未解決のレビューコメント）を
   すべて確認し直す。CI は `gh pr checks <番号> --watch --fail-fast` で待つ。承認が外れた、CI が
-  失敗した、などで状態が変わったら、マージせずに止まって確認する。控えた SHA は push 後の head の
-  SHA に置き換える。
+  失敗した、などで状態が変わったら、マージせずに止まって確認する。push したら、控えた SHA を
+  自分が push したコミットの SHA（`git rev-parse HEAD`）に置き換える（gh から head を読み直さない）。
 - 対応が実施できない・失敗した場合は、**マージせずに止まり**、何が起きたかを伝えて確認する
   （前提を満たさないままマージしない）。
 
